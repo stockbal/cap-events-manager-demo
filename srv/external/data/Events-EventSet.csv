@@ -1,0 +1,3 @@
+EventId;EventName;EventDate;EventStart;EventEnd
+1;COTA;2021-10-22T00:00:00Z;02:00:00;04:00:00
+2;BTP;2021-11-15T12:00:00Z;14:00:00;16:00:00

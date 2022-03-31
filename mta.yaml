@@ -1,0 +1,150 @@
+_schema-version: "3.1"
+ID: event-manager
+description: CAP Demo + OnPrem OData + Standalone App router
+version: 1.0.0
+
+parameters:
+  deploy_mode: html5-repo
+  enable-parallel-deployments: true
+
+build-parameters:
+  before-all:
+    - builder: custom
+      commands:
+        - npm install --production
+        - npx -p @sap/cds-dk cds build --production
+
+modules:
+  # The standalone app router is not really needed as a managed app router
+  # is provided by the launchpad service
+  # ------------------ APP ROUTER MODULE -------------------
+  - name: event-manager-app-router
+    type: approuter.nodejs
+    path: app-router
+    requires:
+      - name: event-manager-destination
+      - name: event-manager-uaa
+      - name: event-manager-repo-runtime
+    parameters:
+      memory: 128M
+    build-parameters:
+      ignore:
+        - node_modules/
+
+    # ------------------ SERVICE MODULE --------------------
+  - name: event-manager-srv
+    type: nodejs
+    path: gen/srv
+    requires:
+      - name: event-manager-destination
+      - name: event-manager-uaa
+      - name: event-manager-srv-connectivity
+    provides:
+      - name: event-manager-srv-api
+        properties:
+          srv-url: ${default-url}
+    parameters:
+      buildpack: nodejs_buildpack
+    build-parameters:
+      ignore:
+        - node_modules/
+
+    # -------------- DESTINATION CONTENT ------------------
+  - name: event-manager-destination-content
+    type: com.sap.application.content
+    requires:
+      - name: event-manager-destination
+        parameters:
+          content-target: true
+      - name: event-manager-repo-host
+        parameters:
+          service-key:
+            name: event-manager-repo-host-key
+      - name: event-manager-uaa
+        parameters:
+          service-key:
+            name: event-manager-uaa-key
+      - name: event-manager-srv-api
+    parameters:
+      content:
+        instance:
+          destinations:
+            - Name: event-manager-repo-host
+              ServiceInstanceName: event-manager-repo-host
+              ServiceKeyName: event-manager-repo-host-key
+              sap.cloud.service: com.devepos.cap.fe.manageevents
+            - Name: event-manager-uaa
+              Authentication: OAuth2UserTokenExchange
+              ServiceInstanceName: event-manager-uaa
+              ServiceKeyName: event-manager-uaa-key
+              sap.cloud.service: com.devepos.cap.fe.manageevents
+            - Name: event-manager-srv-api
+              Authentication: OAuth2UserTokenExchange
+              TokenServiceInstanceName: event-manager-uaa
+              TokenServiceKeyName: event-manager-uaa-key
+              URL: ~{event-manager-srv-api/srv-url}
+          existing_destinations_policy: update
+    build-parameters:
+      no-source: true
+
+    # ------------------ APP CONTENT ---------------------
+  - name: event-manager-app-content
+    type: com.sap.application.content
+    path: .
+    requires:
+      - name: event-manager-repo-host
+        parameters:
+          content-target: true
+    build-parameters:
+      build-result: resources
+      requires:
+        - artifacts:
+            - comdeveposcapfemanageevents.zip
+          name: comdeveposcapfemanageevents
+          target-path: resources/
+    # ------------------ UI5 FE app for events
+  - name: comdeveposcapfemanageevents
+    type: html5
+    path: app/event-manager-fe
+    build-parameters:
+      build-result: dist
+      builder: custom
+      commands:
+        - npm install
+        - npm run build:cf
+      supported-platforms: []
+
+resources:
+  - name: event-manager-destination
+    type: org.cloudfoundry.managed-service
+    parameters:
+      config:
+        HTML5Runtime_enabled: true
+        version: 1.0.0
+      service: destination
+      service-plan: lite
+
+  - name: event-manager-srv-connectivity
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: connectivity
+      service-plan: lite
+
+  - name: event-manager-uaa
+    type: org.cloudfoundry.managed-service
+    parameters:
+      path: ./xs-security.json
+      service: xsuaa
+      service-plan: application
+
+  - name: event-manager-repo-host
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: html5-apps-repo
+      service-plan: app-host
+
+  - name: event-manager-repo-runtime
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: html5-apps-repo
+      service-plan: app-runtime

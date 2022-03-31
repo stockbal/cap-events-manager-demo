@@ -1,0 +1,116 @@
+{
+  "meta": {
+    "creator": "cds-dk 4.6.2"
+  },
+  "$version": "2.0",
+  "definitions": {
+    "Events": {
+      "kind": "service",
+      "@cds.external": true
+    },
+    "Events.EventSet": {
+      "kind": "entity",
+      "@sap.content.version": "1",
+      "elements": {
+        "EventId": {
+          "key": true,
+          "type": "cds.String",
+          "length": 3,
+          "@sap.unicode": "false",
+          "@sap.updatable": "false"
+        },
+        "EventName": {
+          "type": "cds.String",
+          "length": 200,
+          "@sap.unicode": "false"
+        },
+        "EventStart": {
+          "type": "cds.Time",
+          "@sap.unicode": "false"
+        },
+        "EventEnd": {
+          "type": "cds.Time",
+          "@sap.unicode": "false"
+        },
+        "EventDate": {
+          "type": "cds.DateTime",
+          "@sap.unicode": "false"
+        },
+        "Participants": {
+          "doc": "Please add  an ON condition",
+          "type": "cds.Association",
+          "target": "Events.ParticipantSet",
+          "cardinality": {
+            "max": "*"
+          },
+          "on": [
+            {
+              "ref": [
+                "Participants",
+                "EventId"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "EventId"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "Events.ParticipantSet": {
+      "kind": "entity",
+      "@sap.content.version": "1",
+      "elements": {
+        "EventId": {
+          "key": true,
+          "type": "cds.String",
+          "length": 3,
+          "@sap.unicode": "false",
+          "@sap.creatable": "false",
+          "@sap.updatable": "false",
+          "@sap.sortable": "false",
+          "@sap.filterable": "false"
+        },
+        "ParticipId": {
+          "key": true,
+          "type": "cds.String",
+          "length": 3,
+          "@sap.unicode": "false",
+          "@sap.creatable": "false",
+          "@sap.updatable": "false",
+          "@sap.sortable": "false",
+          "@sap.filterable": "false"
+        },
+        "FirstName": {
+          "type": "cds.String",
+          "length": 50,
+          "@sap.unicode": "false",
+          "@sap.creatable": "false",
+          "@sap.updatable": "false",
+          "@sap.sortable": "false",
+          "@sap.filterable": "false"
+        },
+        "LastName": {
+          "type": "cds.String",
+          "length": 50,
+          "@sap.unicode": "false",
+          "@sap.creatable": "false",
+          "@sap.updatable": "false",
+          "@sap.sortable": "false",
+          "@sap.filterable": "false"
+        },
+        "Adress": {
+          "type": "cds.LargeString",
+          "@sap.unicode": "false",
+          "@sap.creatable": "false",
+          "@sap.updatable": "false",
+          "@sap.sortable": "false",
+          "@sap.filterable": "false"
+        }
+      }
+    }
+  }
+}

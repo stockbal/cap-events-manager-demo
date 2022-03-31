@@ -1,0 +1,11 @@
+{
+  "authenticationMethod": "route",
+  "routes": [
+    {
+      "source": "/event-manager/(.*)",
+      "target": "/event-manager/$1",
+      "destination": "event-manager-srv-api"
+    }
+  ],
+  "welcomeFile": "/comdeveposcapfemanageevents/index.html"
+}

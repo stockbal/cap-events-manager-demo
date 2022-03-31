@@ -1,0 +1,9 @@
+
+# Execute bound action ConfirmParticipation
+POST http://localhost:4004/event-manager/events('001')/EventManager.ConfirmParticipation HTTP/1.1
+Content-Type: application/json
+
+###
+
+# Retrieve events 
+GET http://localhost:4004/event-manager/events HTTP/1.1
