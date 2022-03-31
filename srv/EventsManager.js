@@ -8,7 +8,9 @@ module.exports = cds.service.impl(async function () {
 
   this.on("READ", ["Events", "Participants"], (request) => {
     console.log("READ executed by " + request.user);
-    return service.tx(request).run(request.query);
+    return service
+      .tx(request)
+      .send({ query: request.query, headers: { userid: request.user } });
   });
 
   this.on("PUT", ["Events", "Participants"], (request) => {
