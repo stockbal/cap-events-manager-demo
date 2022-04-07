@@ -7,3 +7,8 @@ Content-Type: application/json
 
 # Retrieve events 
 GET http://localhost:4004/event-manager/Events HTTP/1.1
+
+###
+
+# Retrieve events with filter
+GET http://localhost:4004/event-manager/Events?$filter=(EventId eq '001') or (EventId eq '002') HTTP/1.1

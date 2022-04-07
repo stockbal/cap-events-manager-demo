@@ -1,9 +1,8 @@
-using {Events as external} from './external/Events.csn';
+using {ExtEventsAPI as external} from './external/ExtEventsAPI.csn';
 
 @requires : 'authenticated-user'
 service EventManager {
 
-    // @readonly
     entity Events       as projection on external.EventSet {
         key EventId,
             EventName,
