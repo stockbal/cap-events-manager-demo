@@ -1,87 +1,92 @@
 {
-  "name": "cap-events-manager-demo",
-  "version": "1.0.0",
-  "description": "CAP app + OnPrem OData + standalone app router",
-  "license": "UNLICENSED",
-  "private": true,
-  "dependencies": {
-    "@sap/cds": "5.6.2",
-    "@sap/cds-odata-v2-adapter-proxy": "^1.8.4",
-    "@sap/xssec": "^3.2.10",
-    "express": "^4",
-    "passport": "^0.5.0"
-  },
-  "devDependencies": {
-    "@sap/ux-specification": "^1.90.14",
-    "sqlite3": "^5.0.2"
-  },
-  "scripts": {
-    "start": "cds run",
-    "watch": "cds watch",
-    "build": "mbt build",
-    "watch-event-manager": "cds watch --open app/event-manager-fe/webapp/index.html#fe-lrop-v4",
-    "deploy": "cf deploy mta_archives/event-manager_1.0.0.mtar",
-    "undeploy": "cf undeploy event-manager --delete-services --delete-service-keys",
-    "cf:getenv": "cf env event-manager-srv | sed -e '/VCAP_SERVICES.*/,/VCAP_APPLICATION.*/ !d' -e '/^$/ d' -e 's/\\(.*\\)/  \\1/' -e 's/  VCAP_SERVICES/{\\n  \"VCAP_SERVICES\"/' -e 's/  VCAP_APPLICATION: {/}/' > default-env.json"
-  },
-  "eslintConfig": {
-    "extends": "eslint:recommended",
-    "env": {
-      "es2020": true,
-      "node": true,
-      "jest": true,
-      "mocha": true
+    "name": "cap-events-manager-demo",
+    "version": "1.0.0",
+    "description": "CAP app + OnPrem OData + standalone app router",
+    "license": "UNLICENSED",
+    "private": true,
+    "dependencies": {
+        "@sap/cds": "5.6.2",
+        "@sap/cds-odata-v2-adapter-proxy": "^1.8.4",
+        "@sap/xssec": "^3.2.10",
+        "express": "^4",
+        "passport": "^0.5.0"
     },
-    "globals": {
-      "SELECT": true,
-      "INSERT": true,
-      "UPDATE": true,
-      "DELETE": true,
-      "CREATE": true,
-      "DROP": true,
-      "CDL": true,
-      "CQL": true,
-      "CXL": true,
-      "cds": true
+    "devDependencies": {
+        "@sap/ux-specification": "^1.96.9",
+        "sqlite3": "^5.0.2"
     },
-    "rules": {
-      "no-console": "off",
-      "require-atomic-updates": "off"
-    }
-  },
-  "prettier": {
-    "endOfLine": "lf",
-    "trailingComma": "none",
-    "tabWidth": 2,
-    "useTabs": false
-  },
-  "cds": {
-    "requires": {
-      "Events": {
-        "kind": "odata-v2",
-        "model": "srv/external/Events",
-        "[production]": {
-          "credentials": {
-            "destination": "events-api"
-          }
+    "scripts": {
+        "start": "cds run",
+        "watch": "cds watch",
+        "build": "mbt build",
+        "watch-event-manager": "cds watch --open app/event-manager-fe/webapp/index.html#fe-lrop-v4",
+        "deploy": "cf deploy mta_archives/event-manager_1.0.0.mtar",
+        "undeploy": "cf undeploy event-manager --delete-services --delete-service-keys",
+        "cf:getenv": "cf env event-manager-srv | sed -e '/VCAP_SERVICES.*/,/VCAP_APPLICATION.*/ !d' -e '/^$/ d' -e 's/\\(.*\\)/  \\1/' -e 's/  VCAP_SERVICES/{\\n  \"VCAP_SERVICES\"/' -e 's/  VCAP_APPLICATION: {/}/' > default-env.json",
+        "watch-manageeventshana": "cds watch --open manageeventshana/webapp/index.html?sap-ui-xx-viewCache=false#fe-lrop-v4"
+    },
+    "eslintConfig": {
+        "extends": "eslint:recommended",
+        "env": {
+            "es2020": true,
+            "node": true,
+            "jest": true,
+            "mocha": true
         },
-        "[development]": {
-          "credentials": {
-            "destination": "events-api"
-          }
+        "globals": {
+            "SELECT": true,
+            "INSERT": true,
+            "UPDATE": true,
+            "DELETE": true,
+            "CREATE": true,
+            "DROP": true,
+            "CDL": true,
+            "CQL": true,
+            "CXL": true,
+            "cds": true
+        },
+        "rules": {
+            "no-console": "off",
+            "require-atomic-updates": "off"
         }
-      },
-      "auth": {
-        "[development]": {
-          "strategy": "dummy"
+    },
+    "prettier": {
+        "endOfLine": "lf",
+        "trailingComma": "none",
+        "tabWidth": 2,
+        "useTabs": false
+    },
+    "cds": {
+        "requires": {
+            "ExtEventsAPI": {
+                "kind": "odata-v2",
+                "model": "srv/external/ExtEventsAPI",
+                "[production]": {
+                    "credentials": {
+                        "destination": "events-api"
+                    }
+                },
+                "[development]": {
+                    "credentials": {
+                        "destination": "events-api"
+                    }
+                }
+            },
+            "auth": {
+                "[development]": {
+                    "strategy": "dummy"
+                }
+            },
+            "uaa": {
+                "kind": "xsuaa-auth"
+            },
+            "db": {
+                "kind": "sqlite"
+            }
         }
-      },
-      "uaa": {
-        "kind": "xsuaa-auth"
-      }
-    }
-  },
-  "sapux": [
-    "app/event-manager"
-  ]
+    },
+    "sapux": [
+        "app/event-manager",
+        "app/event-manager-hana-fe"
+    ]
 }

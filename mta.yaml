@@ -2,18 +2,6 @@ _schema-version: "3.1"
 ID: event-manager
 description: CAP Demo + OnPrem OData + Standalone App router
 version: 1.0.0
-
-parameters:
-  deploy_mode: html5-repo
-  enable-parallel-deployments: true
-
-build-parameters:
-  before-all:
-    - builder: custom
-      commands:
-        - npm install --production
-        - npx -p @sap/cds-dk cds build --production
-
 modules:
   # The standalone app router is not really needed as a managed app router
   # is provided by the launchpad service
@@ -73,13 +61,13 @@ modules:
               ServiceInstanceName: event-manager-repo-host
               ServiceKeyName: event-manager-repo-host-key
               sap.cloud.service: com.devepos.cap.fe.manageevents
-            - Name: event-manager-uaa
-              Authentication: OAuth2UserTokenExchange
+            - Authentication: OAuth2UserTokenExchange
+              Name: event-manager-uaa
               ServiceInstanceName: event-manager-uaa
               ServiceKeyName: event-manager-uaa-key
               sap.cloud.service: com.devepos.cap.fe.manageevents
-            - Name: event-manager-srv-api
-              Authentication: OAuth2UserTokenExchange
+            - Authentication: OAuth2UserTokenExchange
+              Name: event-manager-srv-api
               TokenServiceInstanceName: event-manager-uaa
               TokenServiceKeyName: event-manager-uaa-key
               URL: ~{event-manager-srv-api/srv-url}
@@ -102,10 +90,25 @@ modules:
             - comdeveposcapfemanageevents.zip
           name: comdeveposcapfemanageevents
           target-path: resources/
-    # ------------------ UI5 FE app for events
+        - artifacts:
+            - comdeveposcapfemanageeventshana.zip
+          name: comdeveposcapfemanageeventshana
+          target-path: resources/
+
   - name: comdeveposcapfemanageevents
     type: html5
     path: app/event-manager-fe
+    build-parameters:
+      build-result: dist
+      builder: custom
+      commands:
+        - npm install
+        - npm run build:cf
+      supported-platforms: []
+
+  - name: comdeveposcapfemanageeventshana
+    type: html5
+    path: app/event-manager-hana-fe
     build-parameters:
       build-result: dist
       builder: custom
@@ -120,6 +123,15 @@ resources:
     parameters:
       config:
         HTML5Runtime_enabled: true
+        init_data:
+          instance:
+            destinations:
+              - Authentication: NoAuthentication
+                Name: ui5
+                ProxyType: Internet
+                Type: HTTP
+                URL: https://ui5.sap.com
+            existing_destinations_policy: update
         version: 1.0.0
       service: destination
       service-plan: lite
@@ -148,3 +160,14 @@ resources:
     parameters:
       service: html5-apps-repo
       service-plan: app-runtime
+
+parameters:
+  deploy_mode: html5-repo
+  enable-parallel-deployments: true
+
+build-parameters:
+  before-all:
+    - builder: custom
+      commands:
+        - npm install --production
+        - npx -p @sap/cds-dk cds build --production
